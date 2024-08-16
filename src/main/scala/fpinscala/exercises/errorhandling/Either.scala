@@ -8,13 +8,33 @@ enum Either[+E,+A]:
   case Left(get: E)
   case Right(get: A)
 
-  def map[B](f: A => B): Either[E, B] = ???
+  def map[B](f: A => B): Either[E, B] =
+    this match
+      case Left(e) => Left(e)
+      case Right(a) => Right(f(a))
 
-  def flatMap[EE >: E, B](f: A => Either[EE, B]): Either[EE, B] = ???
+  def flatMap[EE >: E, B](f: A => Either[EE, B]): Either[EE, B] =
+    // [EE >: E, B], means that EE is a supertype of E  (supertype: Either and subtype: Left and Right)
+    // f: A => Either[EE, B], means that f is a function that takes an A and returns an Either[EE, B]
+    // return type is Either[EE, B], which means that the result of the flatMap operation is an Either with a type parameter of EE and B
+    this match
+      case Left(e) => Left(e)
+      case Right(a) => f(a)
 
-  def orElse[EE >: E, B >: A](b: => Either[EE, B]): Either[EE, B] = ???
+  def orElse[EE >: E, B >: A](b: => Either[EE, B]): Either[EE, B] =
+    this match
+      case Left(_) => b
+      case Right(a) => Right(a)
 
-  def map2[EE >: E, B, C](b: Either[EE, B])(f: (A, B) => C): Either[EE, C] = ???
+
+  /*map2 combines two Either values.
+  If both are Right, it applies the given function to their contents and returns a Right with the result.
+  If either one is a Left, it returns that Left (essentially propagating the error).*/
+  def map2[EE >: E, B, C](b: Either[EE, B])(f: (A, B) => C): Either[EE, C] =
+    for //The method body uses a for-comprehension which is a concise way to chain operations on monadic types like Either.
+      a <- this //a <- this: Extracts the value a if this is a Right, or returns Left if this is a Left.
+      b1 <- b //b1 <- b: Extracts the value b1 if b is a Right, or returns Left if b is a Left.
+    yield f(a,b1)
 
 object Either:
   def traverse[E,A,B](es: List[A])(f: A => Either[E, B]): Either[E, List[B]] = ???
