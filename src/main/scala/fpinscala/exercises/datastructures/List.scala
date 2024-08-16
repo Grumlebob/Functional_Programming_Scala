@@ -91,46 +91,55 @@ object List: // `List` companion object. Contains functions for creating and wor
 
   def sumViaFoldLeft(ns: List[Int]): Int =
     def add(acc: Int, curr_element: Int): Int = acc + curr_element
+
     val acc = 0
     foldLeft(ns, acc, add)
 
   def productViaFoldLeft(ns: List[Double]): Double =
     def product(acc: Double, curr_element: Double): Double = acc * curr_element
+
     val acc = 1
     foldLeft(ns, acc, product)
 
   def lengthViaFoldLeft[A](l: List[A]): Int =
     def lenght(acc: Int, curr_element: A): Int = 1 + acc
+
     val acc = 0
     foldLeft(l, acc, lenght)
 
   def reverse[A](l: List[A]): List[A] =
     def reverseList(acc: List[A], curr_element: A): List[A] = Cons(curr_element, acc)
+
     val acc = Nil
     foldLeft(l, acc, reverseList)
 
   def appendViaFoldRight[A](l: List[A], r: List[A]): List[A] =
     def appendList(acc: List[A], curr_element: A): List[A] = Cons(curr_element, acc)
-    foldRight(l, r, Cons(_,_)) //Vi giver vores start liste, og som acc giver vi den liste vi vil appende til
+
+    foldRight(l, r, Cons(_, _)) //Vi giver vores start liste, og som acc giver vi den liste vi vil appende til
 
   def concat[A](l: List[List[A]]): List[A] =
     def appendList(acc: List[A], curr_element: List[A]): List[A] = appendViaFoldRight(acc, curr_element)
+
     foldLeft(l, Nil, appendList)
 
   def incrementEach(l: List[Int]): List[Int] =
     def increment(acc: List[Int], curr_element: Int): List[Int] = Cons(curr_element + 1, acc)
+
     val acc = Nil
     val result = foldLeft(l, acc, increment)
     reverse(result)
 
   def doubleToString(l: List[Double]): List[String] =
     def doubleToString(acc: List[String], curr_element: Double): List[String] = Cons(curr_element.toString, acc)
+
     val acc = Nil
     val result = foldLeft(l, acc, doubleToString)
     reverse(result)
 
   def map[A, B](l: List[A], f: A => B): List[B] =
-    def mapper (acc: List[B], curr_element: A): List[B] = Cons(f(curr_element), acc)
+    def mapper(acc: List[B], curr_element: A): List[B] = Cons(f(curr_element), acc)
+
     val acc = Nil
     val result = foldLeft(l, acc, mapper)
     reverse(result)
@@ -138,6 +147,7 @@ object List: // `List` companion object. Contains functions for creating and wor
 
   def filter[A](as: List[A], f: A => Boolean): List[A] =
     def filterer(acc: List[A], curr_element: A): List[A] = if f(curr_element) then Cons(curr_element, acc) else acc
+
     val acc = Nil
     val result = foldLeft(as, acc, filterer)
     reverse(result)
@@ -145,6 +155,7 @@ object List: // `List` companion object. Contains functions for creating and wor
   //We apply f to each element which returns a list, and then we append the lists together
   def flatMap[A, B](as: List[A], f: A => List[B]): List[B] =
     def flatMapper(acc: List[B], curr_element: A): List[B] = appendViaFoldRight(f(curr_element), acc)
+
     val acc = Nil
     val result = foldLeft(as, acc, flatMapper)
     reverse(result)
@@ -152,18 +163,19 @@ object List: // `List` companion object. Contains functions for creating and wor
   def filterViaFlatMap[A](as: List[A], f: A => Boolean): List[A] =
     flatMap(as, (a: A) => if f(a) then List(a) else Nil)
 
-  def addPairwise(a: List[Int], b: List[Int]): List[Int] = (a,b) match
+  def addPairwise(a: List[Int], b: List[Int]): List[Int] = (a, b) match
     case (Nil, _) => Nil
     case (_, Nil) => Nil
-    case (Cons(h1,t1), Cons(h2,t2)) => Cons(h1+h2, addPairwise(t1,t2))
+    case (Cons(h1, t1), Cons(h2, t2)) => Cons(h1 + h2, addPairwise(t1, t2))
 
-  def zipWith[A, B,C](a: List[A], b: List[B], f: (A, B) => C): List[C] =
+  def zipWith[A, B, C](a: List[A], b: List[B], f: (A, B) => C): List[C] =
     @annotation.tailrec
     def loop(a: List[A], b: List[B], acc: List[C]): List[C] =
       (a, b) match
         case (Nil, _) => acc
         case (_, Nil) => acc
         case (Cons(h1, t1), Cons(h2, t2)) => loop(t1, t2, Cons(f(h1, h2), acc))
+
     reverse(loop(a, b, Nil))
 
   def hasSubsequence[A](listToCheck: List[A], seqToFind: List[A]): Boolean =
